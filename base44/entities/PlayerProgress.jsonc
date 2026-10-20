@@ -1,0 +1,71 @@
+{
+  "name": "PlayerProgress",
+  "type": "object",
+  "properties": {
+    "hero": {
+      "type": "string",
+      "enum": [
+        "andrew",
+        "werdna"
+      ],
+      "default": "andrew"
+    },
+    "xp": {
+      "type": "number",
+      "default": 0
+    },
+    "rank": {
+      "type": "string",
+      "default": "Rookie"
+    },
+    "completed_missions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "badges": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "quest_log": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "default": []
+    },
+    "shards": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "intel": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "met_npcs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "settings": {
+      "type": "object",
+      "default": {}
+    }
+  },
+  "required": [
+    "hero"
+  ]
+}

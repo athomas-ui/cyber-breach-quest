@@ -1,0 +1,185 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 4%;
+    --foreground: 190 30% 96%;
+    --card: 222 40% 6%;
+    --card-foreground: 190 30% 96%;
+    --popover: 222 40% 6%;
+    --popover-foreground: 190 30% 96%;
+    --primary: 160 100% 50%;
+    --primary-foreground: 222 47% 4%;
+    --secondary: 222 30% 12%;
+    --secondary-foreground: 190 30% 96%;
+    --muted: 222 30% 12%;
+    --muted-foreground: 200 12% 62%;
+    --accent: 270 80% 68%;
+    --accent-foreground: 222 47% 4%;
+    --destructive: 345 90% 56%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 200 30% 18%;
+    --input: 200 30% 18%;
+    --ring: 160 100% 50%;
+    --radius: 0.6rem;
+    --chart-1: 160 100% 50%;
+    --chart-2: 270 80% 68%;
+    --chart-3: 199 89% 60%;
+    --chart-4: 35 95% 60%;
+    --chart-5: 345 90% 56%;
+    --font-heading: 'Orbitron', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Rajdhani', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Orbitron', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --sidebar-background: 222 40% 6%;
+    --sidebar-foreground: 190 30% 96%;
+    --sidebar-primary: 160 100% 50%;
+    --sidebar-primary-foreground: 222 47% 4%;
+    --sidebar-accent: 222 30% 12%;
+    --sidebar-accent-foreground: 190 30% 96%;
+    --sidebar-border: 200 30% 18%;
+    --sidebar-ring: 160 100% 50%;
+  }
+
+  .dark {
+    --background: 222 47% 4%;
+    --foreground: 190 30% 96%;
+    --card: 222 40% 6%;
+    --card-foreground: 190 30% 96%;
+    --popover: 222 40% 6%;
+    --popover-foreground: 190 30% 96%;
+    --primary: 160 100% 50%;
+    --primary-foreground: 222 47% 4%;
+    --secondary: 222 30% 12%;
+    --secondary-foreground: 190 30% 96%;
+    --muted: 222 30% 12%;
+    --muted-foreground: 200 12% 62%;
+    --accent: 270 80% 68%;
+    --accent-foreground: 222 47% 4%;
+    --destructive: 345 90% 56%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 200 30% 18%;
+    --input: 200 30% 18%;
+    --ring: 160 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  canvas {
+    touch-action: none;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 157, 0.25);
+  border-radius: 999px;
+}
+
+.cb-tablet {
+  animation: cb-tablet-in 0.3s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.cb-rise {
+  animation: cb-rise 0.26s ease-out;
+}
+
+.cb-float {
+  animation: cb-float 1.7s ease-out forwards;
+}
+
+.cb-glitch {
+  text-shadow: 0 0 30px rgba(0, 255, 157, 0.3);
+  animation: cb-glitch 7s infinite;
+}
+
+@keyframes cb-tablet-in {
+  from {
+    opacity: 0;
+    transform: translateY(48px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cb-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cb-float {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.9);
+  }
+  18% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-48px) scale(1.05);
+  }
+}
+
+@keyframes cb-drain {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes cb-glitch {
+  0%,
+  90%,
+  100% {
+    text-shadow: 0 0 30px rgba(0, 255, 157, 0.28);
+  }
+  91% {
+    text-shadow: 3px 0 #ff2d55, -3px 0 #38bdf8;
+  }
+  93% {
+    text-shadow: -4px 0 #ff2d55, 4px 0 #38bdf8;
+  }
+  95% {
+    text-shadow: 2px 0 #c084fc, -2px 0 #00ff9d;
+  }
+}
