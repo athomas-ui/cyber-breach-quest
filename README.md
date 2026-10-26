@@ -1,61 +1,143 @@
-# Base44 Project
+# Cyber Breach 🛡️
 
-Use this repository to run and edit the app locally, then publish changes back through Base44.
+Cyber Breach is a cybersecurity project designed to create an interactive experience around cybersecurity concepts, digital threats, and security awareness.
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
+This repository contains the application's source code and provides the tools needed to run, develop, and maintain the project locally.
 
-## Prerequisites
+## 🚀 Getting Started
 
-1. Clone the repository using the project's Git URL.
-2. Navigate to the project directory.
-3. Install dependencies: `npm install`.
-4. Install the Base44 CLI: `npm install -g base44@latest`.
-5. Install [Deno](https://docs.deno.com/runtime/getting_started/installation/) — the local Base44 backend runs on it.
+Follow these instructions to set up Cyber Breach on your local machine.
 
-Run `base44 --help` (or see the [CLI reference](https://docs.base44.com/developers/references/cli/commands/introduction)) for the full command surface.
+### Prerequisites
 
-## Run Locally
+Before you begin, make sure you have installed:
 
-Three commands, from the project root:
+- [Node.js](https://nodejs.org/) (LTS version recommended)
+- npm (included with Node.js)
+- [Git](https://git-scm.com/)
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone <your-repository-url>
+   ```
+
+2. Navigate to the project directory:
+
+   ```bash
+   cd <your-project-directory>
+   ```
+
+3. Install the project dependencies:
+
+   ```bash
+   npm install
+   ```
+
+4. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+5. Open the local URL displayed in your terminal. The application will typically be available at:
+
+   `http://localhost:5173`
+
+## 💻 Development
+
+Use the following commands from the project root to work on the application.
+
+| Command | Description |
+|---|---|
+| `npm install` | Installs project dependencies |
+| `npm run dev` | Starts the local development server |
+| `npm run build` | Builds the application for production |
+| `npm run preview` | Previews the production build locally |
+
+**Note:** Available commands depend on the scripts defined in `package.json`. If a command is unavailable, check that file for the project's configured scripts.
+
+### Making Changes
+
+1. Open the project in your preferred code editor.
+2. Create a new Git branch for your changes.
+3. Modify the application code.
+4. Run the application locally and test your changes.
+5. Build the application to check for production build errors.
+6. Commit and push your changes to GitHub.
+
+Example Git workflow:
 
 ```bash
-base44 login   # one-time per machine
-base44 link    # one-time per clone
-base44 dev     # local backend + frontend together
+git checkout -b feature/your-feature-name
+git add .
+git commit -m "Describe your changes"
+git push -u origin feature/your-feature-name
 ```
 
-Open the frontend URL that `base44 dev` prints (typically `http://localhost:5173`).
+## 🧪 Testing and Quality Checks
 
-Notes:
+Before submitting changes:
 
-- **Every fresh clone needs `base44 link`.** It writes `base44/.app.jsonc` (the app-id pointer), which is deliberately gitignored. Your app id is in the Builder URL (`app.base44.com/apps/<id>/...`); `base44 link --help` shows the non-interactive flags.
-- **`base44 dev` runs the frontend for you** (via `site.serveCommand` in this repo's `base44/config.jsonc`) — never run `npm run dev` yourself: alone it serves a UI with no backend behind it (`[base44] Proxy not enabled`, every `/api` call fails), and alongside `base44 dev` the second Vite silently takes the next port and you end up looking at the wrong one.
-- **The app must be published at least once for the UI to load under `base44 dev`.** The frontend boots by fetching app settings from the hosted app; before the first publish that fails and every page redirects to login. The local API works regardless.
-- Entities, functions, and auth run locally — entity data is **in-memory only**, wiped when `base44 dev` restarts. Everything else (Core integrations, OAuth login) is forwarded to your deployed app. Full breakdown: [Local development overview](https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview).
+- Verify that the application starts successfully.
+- Test new features and existing functionality.
+- Check the browser console for errors.
+- Confirm that the production build completes successfully.
+- Review your changes before committing them.
 
-## Frontend Only, Hosted Backend
-
-To work on just the frontend against your app's live hosted backend:
+Run the production build with:
 
 ```bash
-base44 dev --remote
+npm run build
 ```
 
-⚠️ In this mode writes go to your app's **production data** — plain `base44 dev` keeps everything local.
+## 📦 Deployment
 
-## Publish Your Changes
+Cyber Breach can be deployed using a hosting platform that supports the project's framework and build configuration.
 
-After pushing your changes to git, open the Base44 dashboard and publish the app:
+For a typical Vite frontend, the production build is generated in the `dist` directory.
 
-```bash
-base44 dashboard open
+Deployment configuration will depend on the hosting provider and whether the application uses a separate backend or external APIs.
+
+## 🔐 Security Considerations
+
+Because Cyber Breach focuses on cybersecurity, security should be considered throughout development.
+
+- Never commit API keys, passwords, access tokens, or other secrets.
+- Store sensitive configuration values in environment variables.
+- Keep dependencies updated.
+- Validate user input and handle errors appropriately.
+- Do not expose private credentials or sensitive backend configuration in frontend code.
+- Use authorized, controlled environments for any security testing.
+
+## 📁 Project Structure
+
+The project structure may vary depending on the application's implementation. A typical frontend project includes:
+
+```text
+cyber-breach/
+├── public/          # Static assets
+├── src/             # Application source code
+├── package.json     # Dependencies and scripts
+├── package-lock.json
+├── index.html
+└── README.md
 ```
 
-This repo syncs to Base44 through git, so publish from the dashboard rather than `base44 deploy` — a CLI deploy ships your local tree directly, bypassing the sync, and the deployed state silently diverges from the repo.
+## 🤝 Contributing
 
-## Docs & Support
+Contributions and improvements are welcome.
 
-GitHub integration: [https://docs.base44.com/developers/app-code/local-development/github](https://docs.base44.com/developers/app-code/local-development/github)
+1. Create a branch for your changes.
+2. Keep changes focused and clearly documented.
+3. Test your work before opening a pull request.
+4. Include a concise description of the changes and their purpose.
+
+## 📄 License
+
+A license has not yet been specified. Add a `LICENSE` file when the project's licensing terms have been determined.
 
 Local development: [https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview](https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview)
 
