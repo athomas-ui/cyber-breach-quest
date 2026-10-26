@@ -9,6 +9,11 @@ export const HEROES = {
     outfit: 'hoodie',
     headset: true,
     visor: false,
+    suit: '#1d3550',
+    hair: '#16203a',
+    hairStyle: 'spiky',
+    eyes: '#00e08a',
+    eyesDeep: '#04452f',
     line: 'Hood up, headset on. Slow is smooth, smooth is secure.'
   },
   werdna: {
@@ -21,6 +26,11 @@ export const HEROES = {
     outfit: 'jacket',
     headset: false,
     visor: true,
+    suit: '#3d1f63',
+    hair: '#efe0ff',
+    hairStyle: 'long',
+    eyes: '#b26bff',
+    eyesDeep: '#3a0f6b',
     line: 'Never trust an unsolicited link. Not once. Not ever.'
   }
 };

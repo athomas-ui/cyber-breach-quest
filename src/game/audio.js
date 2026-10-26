@@ -114,6 +114,27 @@ export function sfx(name) {
       tone(90, t, 0.5, 'sawtooth', 0.24);
       noiseBurst(t, 0.5, 0.22, 400);
       break;
+    case 'punch':
+      noiseBurst(t, 0.07, 0.14, 1800);
+      tone(160, t, 0.08, 'square', 0.1);
+      break;
+    case 'whoosh':
+      noiseBurst(t, 0.25, 0.12, 700);
+      noiseBurst(t + 0.08, 0.2, 0.1, 1400);
+      break;
+    case 'dash':
+      tone(520, t, 0.12, 'sawtooth', 0.07);
+      noiseBurst(t, 0.18, 0.14, 2600);
+      break;
+    case 'charge':
+      tone(220, t, 0.35, 'triangle', 0.08);
+      tone(440, t + 0.12, 0.25, 'triangle', 0.06);
+      break;
+    case 'blast':
+      tone(880, t, 0.08, 'square', 0.1);
+      tone(110, t, 0.45, 'sawtooth', 0.2);
+      noiseBurst(t, 0.4, 0.2, 1100);
+      break;
     default:
       break;
   }

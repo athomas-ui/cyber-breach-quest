@@ -9,8 +9,12 @@ let interactQueued = false;
 let tabletQueued = false;
 let sprintTouch = false;
 let attached = false;
+let moveQueued = null;
 
 const MOVE_KEYS = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+
+// Combat moves: J punch combo, K spin kick, L dash, F charged Cyber Blast.
+export const MOVE_BINDS = { KeyJ: 'punch', KeyK: 'kick', KeyL: 'dash', KeyF: 'special' };
 
 function onKeyDown(e) {
   if (MOVE_KEYS.includes(e.code)) {
@@ -31,6 +35,8 @@ function onKeyDown(e) {
   } else if (e.code === 'Tab') {
     tabletQueued = true;
     e.preventDefault();
+  } else if (MOVE_BINDS[e.code]) {
+    moveQueued = MOVE_BINDS[e.code];
   }
 }
 
@@ -78,6 +84,16 @@ export function queueInteract() {
 }
 export function queueTablet() {
   tabletQueued = true;
+}
+
+export function queueMove(name) {
+  moveQueued = name;
+}
+
+export function takeMove() {
+  const v = moveQueued;
+  moveQueued = null;
+  return v;
 }
 
 export function takeJump() {

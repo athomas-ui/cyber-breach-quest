@@ -7,6 +7,7 @@ import Interactor from '@/components/game3d/Interactor';
 import ServerRoom from '@/components/game3d/ServerRoom';
 import BossArena from '@/components/game3d/BossArena';
 import Sparks from '@/components/game3d/Sparks';
+import DialogueBox from '@/components/game/DialogueBox';
 import EmailInspector from '@/components/game/EmailInspector';
 import ExplanationCard from '@/components/game/ExplanationCard';
 import BossHud from '@/components/game/BossHud';
@@ -14,7 +15,7 @@ import ResultsScreen from '@/components/game/ResultsScreen';
 import FxLayer from '@/components/game/FxLayer';
 import TouchControls from '@/components/game/TouchControls';
 import { useGame, actions } from '@/game/store';
-import { EMAILS } from '@/game/content';
+import { EMAILS, MISSION_GUIDE } from '@/game/content';
 import { MISSIONS } from '@/game/constants';
 import { useFight, resetFight, beginIntro, startFight, reportHook, getFight, clearNote } from '@/game/lureFight';
 import { clearWorld, setTimeScale } from '@/game/world';
@@ -46,6 +47,9 @@ export default function MissionBait() {
   const [wrongs, setWrongs] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [resultBadges, setResultBadges] = useState([]);
+  const [dialogue, setDialogue] = useState(null);
+  const [objectiveOpen, setObjectiveOpen] = useState(true);
+  const [guideAnswered, setGuideAnswered] = useState(false);
   const introTimer = useRef(null);
 
   useEffect(() => {
@@ -61,6 +65,10 @@ export default function MissionBait() {
 
   useEffect(() => {
     startMusic(mode === 'boss' ? 'boss' : 'hub');
+  }, [mode]);
+
+  useEffect(() => {
+    setObjectiveOpen(true);
   }, [mode]);
 
   useEffect(() => {
@@ -145,6 +153,11 @@ export default function MissionBait() {
 
   function handleInteract(item) {
     if (!item) return;
+    if (item.type === 'npc' && item.data.npcId === MISSION_GUIDE.id) {
+      sfx('click');
+      setDialogue({ npc: MISSION_GUIDE, stage: 'intro' });
+      return;
+    }
     if (item.type === 'email') {
       const email = EMAILS.find((e) => e.id === item.data.emailId);
       if (email) {
@@ -168,13 +181,39 @@ export default function MissionBait() {
     }
   }
 
+  function chooseDialogue(choice) {
+    const result = guideAnswered ? { ...choice, xp: 0 } : choice;
+    if (choice.correct) {
+      if (!guideAnswered) {
+        actions.addXp(choice.xp);
+        actions.unlockIntel(MISSION_GUIDE.intel);
+        fx(`+${choice.xp} XP`);
+        setGuideAnswered(true);
+      }
+      sfx('correct');
+    } else {
+      sfx('wrong');
+    }
+    setDialogue({ npc: MISSION_GUIDE, stage: 'result', choice: result });
+  }
+
   function leaveMission() {
     window.sessionStorage.setItem('cb_cinematic', 'locksmith');
     startMusic('hub');
     navigate('/hub');
   }
 
-  const levelFrozen = !!active || !!feedback;
+  const levelFrozen = !!active || !!feedback || !!dialogue || objectiveOpen;
+  const roomObjective =
+    mode === 'level'
+      ? {
+          room: 'Server room',
+          text: `Inspect and sort all ${EMAILS.length} messages into SAFE or PHISH. Check sender addresses, links, urgency, and requests for sensitive information. Talk to KAI for a tip.`
+        }
+      : {
+          room: 'Boss arena',
+          text: 'Report only the real phishing hooks before they reach you. Check for lookalike domains and verify suspicious requests.'
+        };
 
   return (
     <div ref={canvasRef} className="fixed inset-0 touch-none overflow-hidden bg-[#02040a]">
@@ -187,7 +226,7 @@ export default function MissionBait() {
         >
           <fog attach="fog" args={['#04080f', 20, 62]} />
           <ambientLight intensity={0.7} color="#7fb6d8" />
-          <ServerRoom quality={quality} sorted={sorted} />
+          <ServerRoom quality={quality} sorted={sorted} guideAnswered={guideAnswered} />
           <Player heroId={game.hero} spawn={[0, 11]} bounds={15.5} frozen={levelFrozen} />
           <Sparks />
           <Interactor onNear={setNear} onInteract={handleInteract} enabled={!levelFrozen} />
@@ -204,9 +243,9 @@ export default function MissionBait() {
           <fog attach="fog" args={['#0a0410', 26, 80]} />
           <ambientLight intensity={0.55} color="#a06a8f" />
           <BossArena quality={quality} />
-          <Player heroId={game.hero} spawn={[0, 12]} bounds={15.5} frozen={showResults} cinematic={cinematic} />
+          <Player heroId={game.hero} spawn={[0, 12]} bounds={15.5} frozen={showResults || objectiveOpen} cinematic={cinematic} />
           <Sparks />
-          <Interactor onNear={setNear} onInteract={handleInteract} enabled={fight.status === 'fight'} />
+          <Interactor onNear={setNear} onInteract={handleInteract} enabled={fight.status === 'fight' && !objectiveOpen} />
         </Canvas>
       )}
 
@@ -239,13 +278,52 @@ export default function MissionBait() {
             </div>
           ) : (
             <p className="font-display text-[9px] uppercase tracking-[0.3em] text-white/25">
-              Walk to a floating email and press E to inspect
+              Inspect email panels or talk to KAI for a tip · press E
             </p>
           )}
         </div>
       )}
 
-      {isTouch && (mode === 'level' ? !levelFrozen : fight.status === 'fight') && <TouchControls />}
+      {objectiveOpen && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+          <section className="cb-rise w-full max-w-lg rounded-2xl border border-sky-300/30 bg-[#060b12]/95 p-5 shadow-[0_0_60px_rgba(56,189,248,0.12)] sm:p-7">
+            <p className="font-display text-[9px] uppercase tracking-[0.38em] text-sky-300">Room objective</p>
+            <h2 className="mt-2 font-display text-xl tracking-[0.14em] text-white">{roomObjective.room}</h2>
+            <p className="mt-3 text-sm leading-relaxed text-white/65">{roomObjective.text}</p>
+            <button
+              onClick={() => setObjectiveOpen(false)}
+              className="mt-5 rounded-lg border border-sky-300/35 bg-sky-300/[0.08] px-4 py-2.5 font-display text-[10px] uppercase tracking-[0.25em] text-sky-100 transition hover:bg-sky-300/[0.16]"
+            >
+              Enter room
+            </button>
+          </section>
+        </div>
+      )}
+
+      {isTouch && (mode === 'level' ? !levelFrozen : fight.status === 'fight' && !objectiveOpen) && <TouchControls />}
+
+      {dialogue && dialogue.stage === 'intro' && (
+        <DialogueBox
+          name={dialogue.npc.name}
+          role={dialogue.npc.role}
+          color={dialogue.npc.color}
+          intro={dialogue.npc.intro}
+          prompt={dialogue.npc.prompt}
+          choices={dialogue.npc.choices}
+          onChoose={chooseDialogue}
+          onClose={() => setDialogue(null)}
+        />
+      )}
+
+      {dialogue && dialogue.stage === 'result' && (
+        <ExplanationCard
+          correct={dialogue.choice.correct}
+          text={dialogue.choice.explain}
+          xp={dialogue.choice.xp}
+          label="Back to room"
+          onContinue={() => setDialogue(null)}
+        />
+      )}
 
       {active && <EmailInspector email={active} onDecide={decide} />}
 

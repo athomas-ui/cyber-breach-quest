@@ -1,8 +1,25 @@
 import React, { useEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import AnimeHead, { HEAD_R } from '@/components/game3d/AnimeHead';
+import { Toon } from '@/components/game3d/toon';
+
+const LOOKS = [
+  { hair: '#f2b84b', style: 'short', suit: '#24324f' },
+  { hair: '#e0475f', style: 'long', suit: '#2b2140' },
+  { hair: '#3b2a24', style: 'spiky', suit: '#1e3b3a' },
+  { hair: '#7dd3fc', style: 'long', suit: '#25283f' },
+  { hair: '#2a1d3d', style: 'short', suit: '#3a2a1e' }
+];
+
+function lookFor(id) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return LOOKS[h % LOOKS.length];
+}
 
 export default function NpcActor({ npc, register, met }) {
+  const look = lookFor(npc.id);
   const group = useRef();
   const body = useRef();
   const marker = useRef();
@@ -56,47 +73,45 @@ export default function NpcActor({ npc, register, met }) {
     if (legR.current) legR.current.rotation.x = -swing;
     if (marker.current) {
       marker.current.rotation.y += dt * 1.6;
-      marker.current.position.y = 2.35 + Math.sin(performance.now() * 0.0025) * 0.1;
+      marker.current.position.y = 2.65 +Math.sin(performance.now() * 0.0025) * 0.1;
     }
   });
 
   return (
     <group ref={group}>
       <group ref={body} position={[0, 0.9, 0]}>
-        <mesh position={[0, 0.32, 0]}>
-          <capsuleGeometry args={[0.24, 0.34, 6, 12]} />
-          <meshStandardMaterial color="#0d1522" roughness={0.65} metalness={0.3} />
-        </mesh>
-        <mesh position={[0, 0.34, 0.22]}>
-          <boxGeometry args={[0.07, 0.3, 0.03]} />
+        <Toon position={[0, 0.3, 0]} color={look.suit}>
+          <capsuleGeometry args={[0.21, 0.3, 6, 12]} />
+        </Toon>
+        <mesh position={[0, 0.32, 0.205]}>
+          <boxGeometry args={[0.06, 0.28, 0.02]} />
           <meshBasicMaterial color={npc.color} toneMapped={false} />
         </mesh>
-        <mesh position={[0, 0.86, 0]}>
-          <sphereGeometry args={[0.175, 16, 16]} />
-          <meshStandardMaterial color="#e8b48c" roughness={0.85} />
-        </mesh>
-        <mesh position={[-0.28, 0.52, 0]} rotation={[0, 0, 0.1]}>
-          <capsuleGeometry args={[0.07, 0.3, 4, 8]} />
-          <meshStandardMaterial color="#0d1522" roughness={0.65} metalness={0.3} />
-        </mesh>
-        <mesh position={[0.28, 0.52, 0]} rotation={[0, 0, -0.1]}>
-          <capsuleGeometry args={[0.07, 0.3, 4, 8]} />
-          <meshStandardMaterial color="#0d1522" roughness={0.65} metalness={0.3} />
-        </mesh>
+        {[-1, 1].map((side) => (
+          <group key={side} position={[side * 0.27, 0.52, 0]} rotation={[0, 0, side * -0.1]}>
+            <Toon position={[0, -0.2, 0]} color={look.suit}>
+              <capsuleGeometry args={[0.066, 0.3, 4, 8]} />
+            </Toon>
+            <Toon position={[0, -0.42, 0]} color="#ffdcc2">
+              <sphereGeometry args={[0.066, 10, 8]} />
+            </Toon>
+          </group>
+        ))}
+        <group position={[0, 0.66 + HEAD_R * 0.95, 0]}>
+          <AnimeHead hair={look.hair} hairStyle={look.style} eyes={npc.color} eyesDeep="#0b1a33" />
+        </group>
       </group>
       <group ref={legL} position={[-0.11, 0.86, 0]}>
-        <mesh position={[0, -0.34, 0]}>
-          <capsuleGeometry args={[0.095, 0.34, 4, 8]} />
-          <meshStandardMaterial color="#101827" roughness={0.7} />
-        </mesh>
+        <Toon position={[0, -0.36, 0]} color="#141b2e">
+          <capsuleGeometry args={[0.09, 0.38, 4, 8]} />
+        </Toon>
       </group>
       <group ref={legR} position={[0.11, 0.86, 0]}>
-        <mesh position={[0, -0.34, 0]}>
-          <capsuleGeometry args={[0.095, 0.34, 4, 8]} />
-          <meshStandardMaterial color="#101827" roughness={0.7} />
-        </mesh>
+        <Toon position={[0, -0.36, 0]} color="#141b2e">
+          <capsuleGeometry args={[0.09, 0.38, 4, 8]} />
+        </Toon>
       </group>
-      <mesh ref={marker} position={[0, 2.35, 0]}>
+      <mesh ref={marker} position={[0, 2.65, 0]}>
         <octahedronGeometry args={[0.13, 0]} />
         <meshBasicMaterial color={met ? '#4a5568' : npc.color} toneMapped={false} />
       </mesh>

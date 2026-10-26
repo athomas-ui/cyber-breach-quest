@@ -1,6 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowUp, Zap } from 'lucide-react';
-import { touchInput, queueJump, queueInteract } from '@/game/input';
+import { touchInput, queueJump, queueInteract, queueMove } from '@/game/input';
+
+const MOVE_BUTTONS = [
+  { move: 'punch', label: 'PUNCH' },
+  { move: 'kick', label: 'KICK' },
+  { move: 'dash', label: 'DASH' },
+  { move: 'special', label: 'BLAST' }
+];
 
 export default function TouchControls() {
   const pad = useRef(null);
@@ -73,6 +80,17 @@ export default function TouchControls() {
       </div>
 
       <div className="pointer-events-auto flex items-end gap-3">
+        <div className="grid grid-cols-2 gap-2">
+          {MOVE_BUTTONS.map((b) => (
+            <button
+              key={b.move}
+              onPointerDown={() => queueMove(b.move)}
+              className="flex h-12 w-12 touch-none items-center justify-center rounded-full border border-fuchsia-300/50 bg-fuchsia-400/15 font-display text-[8px] tracking-wider text-fuchsia-100 active:scale-95"
+            >
+              {b.label}
+            </button>
+          ))}
+        </div>
         <button
           onPointerDown={() => queueInteract()}
           className="flex h-16 w-16 touch-none items-center justify-center rounded-full border border-emerald-300/50 bg-emerald-400/15 font-display text-[10px] tracking-widest text-emerald-200 active:scale-95"

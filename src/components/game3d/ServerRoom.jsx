@@ -3,7 +3,8 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { registerInteractable } from '@/game/world';
 import { signTexture, gridTexture } from '@/game/textures';
-import { EMAILS } from '@/game/content';
+import { EMAILS, MISSION_GUIDE } from '@/game/content';
+import NpcActor from '@/components/game3d/NpcActor';
 
 export const BINS = {
   safe: new THREE.Vector3(-7.5, 0.4, -12.5),
@@ -85,7 +86,7 @@ function Bin({ position, label, color }) {
   );
 }
 
-export default function ServerRoom({ sorted, quality }) {
+export default function ServerRoom({ sorted, quality, guideAnswered }) {
   const floorTex = useMemo(() => {
     const t = gridTexture({ color: '#1b4a6b', bg: '#050a11', cells: 10 });
     t.repeat.set(6, 6);
@@ -151,6 +152,8 @@ export default function ServerRoom({ sorted, quality }) {
           sortedAs={sortedMap[email.id] || null}
         />
       ))}
+
+      <NpcActor npc={MISSION_GUIDE} register={registerInteractable} met={guideAnswered} />
 
       <pointLight position={[0, 5, 0]} color="#7dd3fc" intensity={2.2} distance={22} decay={2} />
       <pointLight position={[0, 2, 10]} color="#38bdf8" intensity={1.2} distance={16} decay={2} />

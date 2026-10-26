@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export const MAX_SPARKS = 90;
+export const MAX_SPARKS = 160;
 export const sparks = [];
 export const shakeState = { value: 0 };
 

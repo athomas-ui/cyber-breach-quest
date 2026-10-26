@@ -9,10 +9,12 @@ import Sparks from '@/components/game3d/Sparks';
 import HubHud from '@/components/game/HubHud';
 import Tablet from '@/components/game/Tablet';
 import DialogueBox from '@/components/game/DialogueBox';
+import GuideChoice from '@/components/game/GuideChoice';
 import ExplanationCard from '@/components/game/ExplanationCard';
 import NoticeCard from '@/components/game/NoticeCard';
 import FxLayer from '@/components/game/FxLayer';
 import TouchControls from '@/components/game/TouchControls';
+import MissionGuide from '@/components/game3d/MissionGuide';
 import { useGame, actions } from '@/game/store';
 import { HEROES, MISSIONS, GATE_SLOTS, gateState, gateRequirement } from '@/game/constants';
 import { NPCS } from '@/game/content';
@@ -65,6 +67,7 @@ export default function Hub() {
   const [notice, setNotice] = useState(null);
   const [cinematicGate, setCinematicGate] = useState(null);
   const [banner, setBanner] = useState(null);
+  const [guideStyle, setGuideStyle] = useState(() => window.sessionStorage.getItem('cb_guide_style'));
 
   useEffect(() => {
     ensureAudio();
@@ -193,7 +196,12 @@ export default function Hub() {
     setDialogue({ npc, stage: 'result', choice });
   }
 
-  const frozen = !!dialogue || tablet || !!notice;
+  function chooseGuide(style) {
+    window.sessionStorage.setItem('cb_guide_style', style);
+    setGuideStyle(style);
+  }
+
+  const frozen = !!dialogue || tablet || !!notice || !guideStyle;
 
   return (
     <div ref={canvasRef} className="fixed inset-0 touch-none overflow-hidden bg-[#04060b]">
@@ -206,6 +214,7 @@ export default function Hub() {
         <ambientLight intensity={0.55} color="#5f7fb5" />
         <directionalLight position={[12, 24, 8]} intensity={0.35} color="#9ad6ff" />
         <CityDistrict quality={quality} progress={game} />
+        {guideStyle && <MissionGuide style={guideStyle} />}
         <Player
           heroId={game.hero}
           spawn={HUB_SPAWN}
@@ -228,6 +237,8 @@ export default function Hub() {
       </Canvas>
 
       <HubHud game={game} hero={hero} onTablet={() => setTablet((v) => !v)} prompt={near ? near.label : null} />
+
+      {!guideStyle && <GuideChoice onChoose={chooseGuide} />}
 
       {banner && (
         <div className="pointer-events-none fixed inset-x-0 top-24 z-30 flex justify-center px-4">

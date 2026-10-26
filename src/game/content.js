@@ -200,4 +200,32 @@ export const NPCS = [
   }
 ];
 
+export const MISSION_GUIDE = {
+  id: 'kai',
+  name: 'KAI',
+  role: 'Threat Analyst',
+  color: '#34d399',
+  patrol: [
+    [-4, 8],
+    [-4, 8]
+  ],
+  intro: 'Before you sort the inbox, remember: a familiar display name does not prove who sent a message. What should you check first?',
+  prompt: 'What is the safest first check?',
+  choices: [
+    {
+      text: 'Inspect the full sender address and verify suspicious requests through a trusted channel.',
+      xp: 10,
+      correct: true,
+      explain: 'Check the real sender domain, inspect links before opening them, and verify unexpected requests through a contact method you already trust.'
+    },
+    {
+      text: 'Trust the display name if the message looks like it came from someone you know.',
+      xp: 0,
+      correct: false,
+      explain: 'Display names are easy to imitate. Check the full sender address and verify unexpected requests independently.'
+    }
+  ],
+  intel: 'phishing_domains'
+};
+
 export const BOSS_HOOK_WINDOW = 7000;
