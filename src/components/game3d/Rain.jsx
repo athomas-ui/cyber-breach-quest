@@ -1,6 +1,5 @@
 import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
 
 export default function Rain({ count = 900, area = 60, height = 26, color = '#9fd8ff', speed = 22 }) {
   const ref = useRef();

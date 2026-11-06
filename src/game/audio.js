@@ -114,9 +114,17 @@ export function sfx(name) {
       tone(90, t, 0.5, 'sawtooth', 0.24);
       noiseBurst(t, 0.5, 0.22, 400);
       break;
-    case 'punch':
-      noiseBurst(t, 0.07, 0.14, 1800);
-      tone(160, t, 0.08, 'square', 0.1);
+    case 'scan':
+      // sonar-style ping that echoes outward
+      tone(1200, t, 0.12, 'sine', 0.12);
+      tone(1200, t + 0.18, 0.12, 'sine', 0.06);
+      tone(1200, t + 0.36, 0.12, 'sine', 0.03);
+      break;
+    case 'firewall':
+      // quick rising shimmer as the shield locks in
+      tone(330, t, 0.1, 'triangle', 0.1);
+      tone(495, t + 0.06, 0.1, 'triangle', 0.1);
+      tone(660, t + 0.12, 0.25, 'triangle', 0.09);
       break;
     case 'whoosh':
       noiseBurst(t, 0.25, 0.12, 700);
@@ -130,10 +138,17 @@ export function sfx(name) {
       tone(220, t, 0.35, 'triangle', 0.08);
       tone(440, t + 0.12, 0.25, 'triangle', 0.06);
       break;
-    case 'blast':
-      tone(880, t, 0.08, 'square', 0.1);
-      tone(110, t, 0.45, 'sawtooth', 0.2);
-      noiseBurst(t, 0.4, 0.2, 1100);
+    case 'uplink':
+      // data transmission chirp
+      tone(880, t, 0.08, 'square', 0.08);
+      tone(1320, t + 0.08, 0.08, 'square', 0.07);
+      tone(1760, t + 0.16, 0.3, 'sine', 0.08);
+      break;
+    case 'alert':
+      // two-note "someone's coming" ping for the stranger encounter
+      tone(740, t, 0.12, 'square', 0.08);
+      tone(554, t + 0.16, 0.18, 'square', 0.08);
+      tone(740, t + 0.42, 0.12, 'square', 0.06);
       break;
     default:
       break;

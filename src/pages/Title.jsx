@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useNavigate } from 'react-router-dom';
+import { useScreenNav } from '@/components/game/ScreenTransition';
 import { ChevronRight, Play, RotateCcw } from 'lucide-react';
 import { useGame } from '@/game/store';
 import { MISSIONS } from '@/game/constants';
@@ -51,7 +51,7 @@ function LogoMark() {
 }
 
 export default function Title() {
-  const navigate = useNavigate();
+  const navigate = useScreenNav();
   const game = useGame();
   const hasProgress = (game.xp || 0) > 0 || (game.completed_missions || []).length > 0;
 

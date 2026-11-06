@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useNavigate } from 'react-router-dom';
+import { useScreenNav } from '@/components/game/ScreenTransition';
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import HeroModel from '@/components/game3d/HeroModel';
 import { HEROES } from '@/game/constants';
@@ -46,7 +46,7 @@ function Stage({ heroId }) {
 }
 
 export default function CharacterSelect() {
-  const navigate = useNavigate();
+  const navigate = useScreenNav();
   const game = useGame();
   const [index, setIndex] = useState(() => Math.max(0, ORDER.indexOf(game.hero || 'andrew')));
   const hero = HEROES[ORDER[index]];

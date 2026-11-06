@@ -13,8 +13,8 @@ let moveQueued = null;
 
 const MOVE_KEYS = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
 
-// Combat moves: J punch combo, K spin kick, L dash, F charged Cyber Blast.
-export const MOVE_BINDS = { KeyJ: 'punch', KeyK: 'kick', KeyL: 'dash', KeyF: 'special' };
+// Cyber-defender abilities: J scan, K firewall, L dash, F uplink beam.
+export const MOVE_BINDS = { KeyJ: 'scan', KeyK: 'firewall', KeyL: 'dash', KeyF: 'uplink' };
 
 function onKeyDown(e) {
   if (MOVE_KEYS.includes(e.code)) {

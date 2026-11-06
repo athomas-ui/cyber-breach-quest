@@ -145,7 +145,8 @@ export const BADGES = [
   { id: 'shard_hunter', name: 'Shard Hunter', desc: 'Recovered all 10 Data Shards hidden in the district.' },
   { id: 'street_wise', name: 'Street Wise', desc: 'Talked with every contact in the security district.' },
   { id: 'flawless_sort', name: 'Flawless Sort', desc: 'Sorted every server-room email correctly, first try.' },
-  { id: 'unbroken', name: 'Unbroken', desc: 'Defeated a boss without letting your shield drop below half.' }
+  { id: 'unbroken', name: 'Unbroken', desc: 'Defeated a boss without letting your shield drop below half.' },
+  { id: 'human_firewall', name: 'Human Firewall', desc: 'Shut down every social engineering approach from strangers in the district.' }
 ];
 
 export const INTEL = [
@@ -156,6 +157,9 @@ export const INTEL = [
   { id: 'passphrase', title: 'Passphrases Beat Complexity', body: 'Length beats symbol soup. Four or five random words make a passphrase that is easier to remember and far harder to crack than P@ssw0rd!. Never reuse one across accounts \u2014 use a manager.' },
   { id: 'least_privilege', title: 'Least Privilege', body: 'Give every account the smallest set of permissions it needs to do its job. If a marketing laptop is compromised, least privilege keeps it from reaching the payroll database.' },
   { id: 'removable_media', title: 'Unattended USB', body: 'A USB drive left in a parking lot is a delivery method, not a gift. Never plug in unknown media \u2014 hand it to security so it can be examined safely.' },
+  { id: 'tailgating', title: 'Tailgating', body: 'Tailgating (or piggybacking) is following someone through a secure door without badging in. Attackers carry boxes, coffee or a story so that holding the door feels like the polite thing to do. Every person badges in on their own; visitors sign in at reception.' },
+  { id: 'pretexting', title: 'Pretexting', body: 'A pretext is a believable cover story: IT support, a vendor, a new manager. The story exists to make an unusual request feel normal. No legitimate IT team will ever ask for your password or an MFA code. Hang up, then call back on a number you already trust.' },
+  { id: 'physical_access', title: 'Device Access', body: 'An unlocked laptop is a logged-in identity. Lock your screen every time you step away (Windows + L, or Ctrl + Cmd + Q on a Mac) and never hand your device to someone else, even for a minute. Anything they do is recorded as you.' },
   { id: 'incident_response', title: 'NIST Incident Response', body: 'The five phases: Identify, Contain, Eradicate, Recover, Lessons Learned. Skipping Contain to go straight to cleanup is how ransomware gets a second foothold.' }
 ];
 

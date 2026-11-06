@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { installKeyboard } from '@/game/input';
 import { ensureAudio, setVolume } from '@/game/audio';
 import { loadProgress, useGame } from '@/game/store';

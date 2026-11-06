@@ -34,8 +34,8 @@ export default function HeroModel({ heroId = 'andrew', motion, tabletUp = false 
     const swing = Math.sin(m.t * stride) * (0.22 + sp * 0.8);
     const a = m.action;
     const p = a ? Math.min(1, a.t / a.dur) : 0;
-    // snap out fast, ease back slow — reads as a hit
-    const strike = a ? (p < 0.3 ? easeOut(p / 0.3) : 1 - easeInOut((p - 0.3) / 0.7)) : 0;
+    // ease into the pose, hold it, then ease back out
+    const pose = a ? (p < 0.25 ? easeOut(p / 0.25) : p > 0.75 ? 1 - easeInOut((p - 0.75) / 0.25) : 1) : 0;
 
     let armLx = tabletUp ? -1.32 : swing * 0.7;
     let armRx = tabletUp ? -1.15 : -swing * 0.7;
@@ -45,7 +45,6 @@ export default function HeroModel({ heroId = 'andrew', motion, tabletUp = false 
     let legRx = swing * 0.85;
     let twist = 0;
     let pitch = sp * 0.12;
-    let spin = 0;
     let shout = 0;
     let charge = 0;
 
@@ -58,58 +57,41 @@ export default function HeroModel({ heroId = 'andrew', motion, tabletUp = false 
     }
 
     if (a) {
-      if (a.name === 'punch') {
-        shout = strike;
-        if (a.step === 2) {
-          armRx = -2.9 * strike;
-          armLx = -0.7;
-          twist = -0.3 * strike;
-          pitch = -0.2 * strike;
-        } else if (a.step === 1) {
-          armLx = -1.65 * strike;
-          armRx = -0.8;
-          twist = 0.6 * strike;
-        } else {
-          armRx = -1.65 * strike;
-          armLx = -0.8;
-          twist = -0.6 * strike;
-        }
-      } else if (a.name === 'kick') {
-        const k = Math.sin(p * Math.PI);
-        spin = easeOut(p) * TAU;
-        legRx = -1.55 * k;
-        legLx = 0.2 * k;
-        armLz = -1.2 * k;
-        armRz = 1.2 * k;
-        shout = k;
+      if (a.name === 'scan') {
+        // hold the tablet out in front and sweep it side to side
+        armLx = -1.35 * pose;
+        armRx = -0.9 * pose;
+        twist = Math.sin(p * TAU) * 0.35 * pose;
+        pitch = 0.08 * pose;
+      } else if (a.name === 'firewall') {
+        // brace and spread both arms outward to project the shield
+        armLx = -1.2 * pose;
+        armRx = -1.2 * pose;
+        armLz = -0.9 * pose;
+        armRz = 0.9 * pose;
+        legLx = -0.25 * pose;
+        legRx = 0.25 * pose;
+        pitch = -0.1 * pose;
       } else if (a.name === 'dash') {
         pitch = 0.6;
         armLx = 1.1;
         armRx = 1.1;
         legLx = -0.7;
         legRx = 0.6;
-      } else if (a.name === 'special') {
-        shout = 1;
+      } else if (a.name === 'uplink') {
+        // charge a signal at chest height, then raise the right hand to the sky
         if (p < 0.45) {
           charge = p / 0.45;
-          armLx = 0.8 * charge;
-          armRx = 0.8 * charge;
-          armLz = -0.35 * charge;
-          armRz = 0.35 * charge;
-          twist = -0.4 * charge;
-          pitch = -0.12 * charge;
-          legLx = -0.4 * charge;
-          legRx = 0.4 * charge;
+          armLx = -0.9 * charge;
+          armRx = -0.9 * charge;
+          pitch = -0.08 * charge;
         } else {
           const r = (p - 0.45) / 0.55;
           charge = 1 - r;
-          armLx = -1.55;
-          armRx = -1.55;
-          armLz = 0.22;
-          armRz = -0.22;
-          pitch = 0.22 * (1 - r);
-          legLx = -0.5;
-          legRx = 0.5;
+          armRx = -3.0 * pose;
+          shout = 0.5 * pose;
+          armLx = -0.5;
+          pitch = -0.15 * pose;
         }
       }
     }
@@ -133,7 +115,6 @@ export default function HeroModel({ heroId = 'andrew', motion, tabletUp = false 
       body.current.rotation.y += (twist - body.current.rotation.y) * snap;
     }
     if (root.current) {
-      root.current.rotation.y = spin;
       root.current.rotation.x = m.flip >= 0 ? easeInOut(m.flip) * TAU : 0;
     }
     if (head.current) {

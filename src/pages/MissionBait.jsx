@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { useNavigate } from 'react-router-dom';
+import { useScreenNav } from '@/components/game/ScreenTransition';
 import * as THREE from 'three';
 import Player from '@/components/game3d/Player';
 import Interactor from '@/components/game3d/Interactor';
@@ -31,7 +31,7 @@ const BOSS = MISSIONS[0];
 export default function MissionBait() {
   const game = useGame();
   const fight = useFight();
-  const navigate = useNavigate();
+  const navigate = useScreenNav();
   const canvasRef = useRef(null);
   useOrbitDrag(canvasRef);
   const isTouch = useIsTouch();

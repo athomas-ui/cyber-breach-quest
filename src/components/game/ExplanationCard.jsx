@@ -1,7 +1,7 @@
 import React from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 
-export default function ExplanationCard({ correct, text, xp, onContinue, label = 'Continue' }) {
+export default function ExplanationCard({ correct, text, xp, onContinue, label = 'Continue', heading, flags }) {
   return (
     <div className="pointer-events-auto fixed inset-x-0 bottom-0 z-[60] flex justify-center p-3 sm:p-6">
       <div
@@ -22,10 +22,25 @@ export default function ExplanationCard({ correct, text, xp, onContinue, label =
               className="font-display text-[10px] uppercase tracking-[0.3em]"
               style={{ color: correct ? '#6ee7b7' : '#fda4af' }}
             >
-              {correct ? 'Correct decision' : 'That one was a trap'}
+              {heading || (correct ? 'Correct decision' : 'That one was a trap')}
               {correct && xp > 0 ? ` \u00b7 +${xp} XP` : ''}
             </p>
             <p className="mt-1.5 text-sm leading-relaxed text-white/80">{text}</p>
+            {flags && flags.length > 0 && (
+              <div className="mt-3">
+                <p className="font-display text-[9px] uppercase tracking-[0.3em] text-amber-300/80">Red flags</p>
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {flags.map((f) => (
+                    <span
+                      key={f}
+                      className="rounded-full border border-amber-300/30 bg-amber-300/10 px-2.5 py-1 text-[11px] text-amber-100/90"
+                    >
+                      {f}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
         <button

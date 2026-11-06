@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { useNavigate } from 'react-router-dom';
+import { useScreenNav } from '@/components/game/ScreenTransition';
 import * as THREE from 'three';
 import Player from '@/components/game3d/Player';
 import Interactor from '@/components/game3d/Interactor';
@@ -15,12 +15,14 @@ import NoticeCard from '@/components/game/NoticeCard';
 import FxLayer from '@/components/game/FxLayer';
 import TouchControls from '@/components/game/TouchControls';
 import MissionGuide from '@/components/game3d/MissionGuide';
+import StrangerActor from '@/components/game3d/StrangerActor';
 import { useGame, actions } from '@/game/store';
 import { HEROES, MISSIONS, GATE_SLOTS, gateState, gateRequirement } from '@/game/constants';
-import { NPCS } from '@/game/content';
+import { NPCS, STRANGERS } from '@/game/content';
+import useStrangerEncounter from '@/game/useStrangerEncounter';
 import { clearWorld } from '@/game/world';
 import { useOrbitDrag, takeTablet } from '@/game/input';
-import { burst } from '@/game/fx3d';
+import { burst, addShake } from '@/game/fx3d';
 import { fx } from '@/game/fx';
 import { startMusic, sfx, ensureAudio } from '@/game/audio';
 import useIsTouch from '@/game/useIsTouch';
@@ -54,7 +56,7 @@ function GateCinematic({ slot, onDone }) {
 
 export default function Hub() {
   const game = useGame();
-  const navigate = useNavigate();
+  const navigate = useScreenNav();
   const canvasRef = useRef(null);
   useOrbitDrag(canvasRef);
   const isTouch = useIsTouch();
@@ -68,6 +70,12 @@ export default function Hub() {
   const [cinematicGate, setCinematicGate] = useState(null);
   const [banner, setBanner] = useState(null);
   const [guideStyle, setGuideStyle] = useState(() => window.sessionStorage.getItem('cb_guide_style'));
+  const [pendingNotice, setPendingNotice] = useState(null);
+
+  // Social engineering ambush: strangers only show up while the player is free-roaming.
+  const { encounter, setPhase: setStrangerPhase, finish: finishStranger } = useStrangerEncounter(
+    !!guideStyle && !dialogue && !tablet && !notice && !cinematicGate
+  );
 
   useEffect(() => {
     ensureAudio();
@@ -181,6 +189,10 @@ export default function Hub() {
   );
 
   function chooseDialogue(choice) {
+    if (dialogue.kind === 'stranger') {
+      chooseStranger(choice);
+      return;
+    }
     const npc = dialogue.npc;
     if (choice.correct) {
       actions.addXp(choice.xp);
@@ -194,6 +206,53 @@ export default function Hub() {
     actions.metNpc(npc.id);
     if (met.size >= NPCS.length) actions.awardBadge('street_wise');
     setDialogue({ npc, stage: 'result', choice });
+  }
+
+  function strangerArrives() {
+    const scenario = encounter.scenario;
+    setStrangerPhase('talk');
+    actions.addQuest({
+      id: 'human_firewall',
+      title: 'Human Firewall',
+      xp: 30,
+      desc: `Shut down all ${STRANGERS.length} social engineering approaches from strangers in the district.`
+    });
+    setDialogue({ npc: scenario, stage: 'intro', kind: 'stranger' });
+  }
+
+  function chooseStranger(choice) {
+    const scenario = dialogue.npc;
+    if (choice.correct) {
+      actions.addXp(choice.xp);
+      actions.unlockIntel(scenario.intel);
+      actions.beatStranger(scenario.id);
+      fx(`+${choice.xp} XP`);
+      sfx('correct');
+      const beaten = new Set([...(game.strangers_beaten || []), scenario.id]);
+      if (beaten.size >= STRANGERS.length && !(game.badges || []).includes('human_firewall')) {
+        actions.completeQuest('human_firewall');
+        actions.addXp(30);
+        actions.awardBadge('human_firewall');
+        setPendingNotice({
+          title: 'HUMAN FIREWALL',
+          body: 'Tailgating, pretexting and device access: you shut down every stranger in the district. +30 XP and the Human Firewall badge are yours.'
+        });
+      }
+    } else {
+      sfx('wrong');
+      addShake(0.25);
+      fx('SOCIAL ENGINEERED');
+    }
+    setDialogue({ ...dialogue, stage: 'result', choice });
+  }
+
+  function strangerWalksAway() {
+    setDialogue(null);
+    setStrangerPhase('leave');
+    if (pendingNotice) {
+      setNotice(pendingNotice);
+      setPendingNotice(null);
+    }
   }
 
   function chooseGuide(style) {
@@ -222,7 +281,22 @@ export default function Hub() {
           frozen={frozen}
           cinematic={!!cinematicGate}
           tabletUp={tablet}
+          focus={!!dialogue}
         />
+        {encounter && (
+          <StrangerActor
+            key={encounter.key}
+            scenario={encounter.scenario}
+            phase={encounter.phase}
+            spawn={encounter.spawn}
+            onReach={strangerArrives}
+            onGiveUp={() => {
+              setStrangerPhase('leave');
+              fx('THEY LOST INTEREST');
+            }}
+            onGone={finishStranger}
+          />
+        )}
         <Sparks />
         <Interactor onNear={setNear} onInteract={handleInteract} enabled={!frozen && !cinematicGate} />
         {cinematicGate && (
@@ -249,6 +323,20 @@ export default function Hub() {
         </div>
       )}
 
+      {encounter && encounter.phase === 'approach' && (
+        <div className="pointer-events-none fixed inset-x-0 top-20 z-30 flex justify-center px-4 sm:top-6">
+          <div
+            className="cb-alert rounded-lg border bg-black/75 px-5 py-2.5 text-center backdrop-blur"
+            style={{ borderColor: `${encounter.scenario.color}88` }}
+          >
+            <p className="font-display text-[9px] uppercase tracking-[0.4em]" style={{ color: encounter.scenario.color }}>
+              Incoming contact
+            </p>
+            <p className="mt-0.5 text-sm text-white/85">Someone is walking straight toward you. Stay sharp.</p>
+          </div>
+        </div>
+      )}
+
       {isTouch && !tablet && !dialogue && <TouchControls />}
 
       {tablet && <Tablet game={game} onClose={() => setTablet(false)} />}
@@ -262,7 +350,7 @@ export default function Hub() {
           prompt={dialogue.npc.prompt}
           choices={dialogue.npc.choices}
           onChoose={chooseDialogue}
-          onClose={() => setDialogue(null)}
+          onClose={() => (dialogue.kind === 'stranger' ? strangerWalksAway() : setDialogue(null))}
         />
       )}
 
@@ -272,7 +360,13 @@ export default function Hub() {
           text={dialogue.choice.explain}
           xp={dialogue.choice.xp}
           label="Back to patrol"
-          onContinue={() => setDialogue(null)}
+          heading={
+            dialogue.kind === 'stranger'
+              ? `${dialogue.choice.correct ? 'Attack shut down' : 'You got social engineered'} \u00b7 ${dialogue.npc.tactic}`
+              : undefined
+          }
+          flags={dialogue.kind === 'stranger' ? dialogue.npc.flags : undefined}
+          onContinue={() => (dialogue.kind === 'stranger' ? strangerWalksAway() : setDialogue(null))}
         />
       )}
 

@@ -9,7 +9,7 @@ export default [
     files: [
       "src/components/**/*.{js,mjs,cjs,jsx}",
       "src/pages/**/*.{js,mjs,cjs,jsx}",
-      "src/Layout.jsx",
+      "src/game/**/*.{js,mjs,cjs,jsx}",
     ],
     ignores: ["src/lib/**/*", "src/components/ui/**/*"],
     ...pluginJs.configs.recommended,
@@ -55,6 +55,14 @@ export default [
         { ignore: ["cmdk-input-wrapper", "toast-close"] },
       ],
       "react-hooks/rules-of-hooks": "error",
+    },
+  },
+  {
+    // three.js / React Three Fiber elements take props like position, args and intensity
+    // that plain React does not know about, so this rule is off for 3D scenes.
+    files: ["src/components/game3d/**/*.jsx", "src/pages/**/*.jsx"],
+    rules: {
+      "react/no-unknown-property": "off",
     },
   },
 ];

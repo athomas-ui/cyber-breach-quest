@@ -229,3 +229,125 @@ export const MISSION_GUIDE = {
 };
 
 export const BOSS_HOOK_WINDOW = 7000;
+// Social engineering ambush: in the hub, a stranger walks up to the player at
+// random and tries one of these. One choice is the secure move; the others are
+// the mistakes attackers count on. `flags` are the red flags shown afterwards.
+export const STRANGERS = [
+  {
+    id: 'tailgate',
+    name: 'VISITOR',
+    role: 'No badge visible',
+    color: '#ff9f1c',
+    prop: 'boxes',
+    tactic: 'Tailgating',
+    intro:
+      'Hey, can you hold that door? My hands are full and my badge is under these boxes somewhere. I’m with the HVAC contractor, they’re expecting me on the server floor.',
+    prompt: 'The secure door is right behind you. What do you do?',
+    choices: [
+      {
+        text: 'Hold the door. His hands are full and it would be rude not to.',
+        xp: 0,
+        correct: false,
+        explain:
+          'That is tailgating. Full hands and a friendly story are the classic setup, because politeness is the exploit. Everyone badges in on their own.'
+      },
+      {
+        text: 'Offer to hold the boxes while he finds his badge, or walk him to the front desk to sign in.',
+        xp: 15,
+        correct: true,
+        explain:
+          'Helpful and secure. A real contractor loses nothing by signing in at reception, and the door stays controlled.'
+      },
+      {
+        text: 'Ask which company he works for, and let him in if it sounds right.',
+        xp: 0,
+        correct: false,
+        explain:
+          'A company name costs nothing to make up. Visitors get verified at the front desk against an expected-visitor list, not by a gut check at the door.'
+      }
+    ],
+    flags: ['No visible badge', 'Full hands to pressure you', 'Name-drops a team that is "expecting" him'],
+    intel: 'tailgating'
+  },
+  {
+    id: 'fake_it',
+    name: 'JAX',
+    role: '"IT Support"',
+    color: '#38bdf8',
+    prop: 'clipboard',
+    tactic: 'Pretexting',
+    intro:
+      'Hey, Jax from IT. We’re seeing malware on your account and I need to fix it before it spreads. Read me your password and the MFA code that’s about to pop up on your phone. Two minutes, tops.',
+    prompt: 'He has a lanyard, but you have never seen him before.',
+    choices: [
+      {
+        text: 'Read him the password and the code. Malware is serious.',
+        xp: 0,
+        correct: false,
+        explain:
+          'Real IT never needs your password or your MFA code. A code that is "about to pop up" means he is logging in as you right now.'
+      },
+      {
+        text: 'Give him the password but keep the MFA code to yourself.',
+        xp: 0,
+        correct: false,
+        explain:
+          'Half a credential is still a credential. Passwords get reused, sold and tried everywhere. Neither one is ever shared, with anyone.'
+      },
+      {
+        text: 'Say no, then call the help desk using the number on the company intranet.',
+        xp: 15,
+        correct: true,
+        explain:
+          'Out-of-band verification. A real ticket will exist and a fake one falls apart. Report the attempt so security can warn everyone else.'
+      }
+    ],
+    flags: ['Unrecognized "IT" person', 'Asks for password and MFA code', 'Urgency: "before it spreads"'],
+    intel: 'pretexting'
+  },
+  {
+    id: 'borrow_laptop',
+    name: 'RILEY',
+    role: 'Says they are a new hire',
+    color: '#f472b6',
+    prop: 'phone',
+    tactic: 'Physical access',
+    intro:
+      'Sorry to bug you! My laptop is still being set up and my phone just died. Can I use yours for one minute? I just need to log into my email and grab a file for my manager.',
+    prompt: 'Your laptop is open and unlocked on the table next to you.',
+    choices: [
+      {
+        text: 'Lock your screen, then point them to the IT help desk for a loaner.',
+        xp: 15,
+        correct: true,
+        explain:
+          'Your device and your session are your identity. Lock it (Windows + L), stay polite, and send them to the people whose job is to help.'
+      },
+      {
+        text: 'Sure, as long as you stand right next to them while they use it.',
+        xp: 0,
+        correct: false,
+        explain:
+          'One minute on an unlocked machine is enough to plant malware, steal session cookies or forward your email. Watching does not stop a USB payload or a quick script.'
+      },
+      {
+        text: 'Sign them into the guest Wi-Fi on your laptop instead.',
+        xp: 0,
+        correct: false,
+        explain:
+          'Still your device, still your session. Whatever happens on it gets logged as you, which is exactly why accounts and devices are never shared.'
+      }
+    ],
+    flags: ['Wants hands on your device', 'Sympathy story: dead phone, new job', 'Drops a manager’s name'],
+    intel: 'physical_access'
+  }
+];
+
+// Timing for random stranger encounters in the hub (milliseconds).
+export const STRANGER_TIMING = {
+  firstMin: 18000,
+  firstMax: 30000,
+  nextMin: 45000,
+  nextMax: 75000,
+  giveUpAfter: 25000
+};

@@ -1,9 +1,9 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useScreenNav } from '@/components/game/ScreenTransition';
 import { ArrowLeft } from 'lucide-react';
 
 export default function Credits() {
-  const navigate = useNavigate();
+  const navigate = useScreenNav();
 
   return (
     <div className="fixed inset-0 overflow-y-auto bg-[#04060b] px-6 py-16">

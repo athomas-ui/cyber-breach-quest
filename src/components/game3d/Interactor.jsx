@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { world, playerPos } from '@/game/world';
 import { takeInteract } from '@/game/input';

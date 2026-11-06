@@ -84,6 +84,21 @@ export default function SettingsPanel({ game, hero }) {
         ))}
       </div>
 
+      <div className="rounded-lg border border-amber-400/20 bg-amber-400/5 p-3">
+        <p className="text-xs text-white/50">
+          Demo tools: send a stranger to try a social engineering trick on you. Shortcut in the district: <span className="text-white/80">B</span>.
+        </p>
+        <button
+          onClick={() => {
+            window.dispatchEvent(new CustomEvent('cb:summon-stranger'));
+            sfx('click');
+          }}
+          className="mt-2 rounded-md border border-amber-400/40 px-3 py-1.5 font-display text-[10px] uppercase tracking-[0.2em] text-amber-200 transition hover:bg-amber-400/10"
+        >
+          Summon a stranger
+        </button>
+      </div>
+
       <div className="rounded-lg border border-rose-500/20 bg-rose-500/5 p-3">
         <p className="text-xs text-white/50">Reset wipes XP, missions, badges and shards on this device.</p>
         <button

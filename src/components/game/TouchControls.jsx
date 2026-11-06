@@ -3,10 +3,10 @@ import { ArrowUp, Zap } from 'lucide-react';
 import { touchInput, queueJump, queueInteract, queueMove } from '@/game/input';
 
 const MOVE_BUTTONS = [
-  { move: 'punch', label: 'PUNCH' },
-  { move: 'kick', label: 'KICK' },
+  { move: 'scan', label: 'SCAN' },
+  { move: 'firewall', label: 'WALL' },
   { move: 'dash', label: 'DASH' },
-  { move: 'special', label: 'BLAST' }
+  { move: 'uplink', label: 'LINK' }
 ];
 
 export default function TouchControls() {

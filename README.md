@@ -1,62 +1,102 @@
-# Base44 Project
+# CYBER//BREACH
 
-Use this repository to run and edit the app locally, then publish changes back through Base44.
+**A 3D browser game that trains people to spot phishing and social engineering by making them do what a security analyst does.**
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
+Created by **Andrew Thomas**, i.c.stars Cycle 60.
+Portfolio: https://athomas-ui.github.io/portfolio/ · LinkedIn: https://www.linkedin.com/in/andrew-thomas-83564259/
 
-## Prerequisites
+---
 
-1. Clone the repository using the project's Git URL.
-2. Navigate to the project directory.
-3. Install dependencies: `npm install`.
-4. Install the Base44 CLI: `npm install -g base44@latest`.
-5. Install [Deno](https://docs.deno.com/runtime/getting_started/installation/) — the local Base44 backend runs on it.
+## Why I built it
 
-Run `base44 --help` (or see the [CLI reference](https://docs.base44.com/developers/references/cli/commands/introduction)) for the full command surface.
+Most breaches don't start with someone hacking through a firewall. They start with a person: a clicked link, a held door, a password read over the phone. Security awareness training is meant to fix that, but it is usually a video people skip. CYBER//BREACH turns the training into decisions you make under pressure, with an explanation after every choice.
 
-## Run Locally
+## What you can play today
 
-Three commands, from the project root:
+| Area | What happens | Security skill |
+|---|---|---|
+| **Security District (hub)** | Explore a neon city, talk to contacts (Maya, Dev, Rio, Kai), collect data shards | Evil twin Wi-Fi, USB drops, password sharing, checking sender domains |
+| **Stranger encounters** | At random, someone walks up to you and tries a trick: tailgating through a secure door, a fake IT tech asking for your password and MFA code, or a "new hire" asking to use your laptop | Tailgating, pretexting, physical device security |
+| **Mission 1: THE BAIT** | Sort a flooded inbox into SAFE or PHISH | Lookalike domains, urgency, BEC, credential harvesting |
+| **Boss: THE LURE KING** | Report real phishing hooks within a 7 second window | Fast triage under pressure |
 
-```bash
-base44 login   # one-time per machine
-base44 link    # one-time per clone
-base44 dev     # local backend + frontend together
+Progression: XP, ranks (Rookie to Architect), badges (including **Human Firewall** for beating every stranger), an intel codex, a quest log and a tablet UI.
+
+**Roadmap** (gates visible in the hub): LOCKSMITH (passwords and MFA), THE IMPOSTER (social engineering), INFECTED (malware), LOCKDOWN (ransomware and NIST incident response).
+
+## Controls
+
+| Key | Action |
+|---|---|
+| WASD / arrows | Move (Shift to sprint) |
+| Mouse drag | Orbit camera |
+| E | Interact / talk |
+| Space (x2) | Jump / flip jump |
+| J K L F | Scan, firewall, dash, uplink |
+| Tab | Tablet (map, quests, intel, badges, settings) |
+| **B** | Summon a stranger encounter now (demo shortcut, also in Tablet > Settings) |
+
+Touch controls appear automatically on phones and tablets.
+
+## Tech stack
+
+- **React 18 + Vite** for the app and build
+- **three.js via React Three Fiber** for the 3D world; every character and building is procedural geometry (no downloaded models)
+- **Web Audio API** for synthesized music and sound effects (no audio files)
+- **Tailwind CSS** for the interface
+- **Local-first save**: progress is stored in the browser with `localStorage`; no accounts or server needed
+
+## How it's organized
+
+```
+src/
+  game/                  game logic, no rendering
+    content.js           every email, hook, NPC conversation and stranger scenario (pure data)
+    constants.js         heroes, ranks, missions, badges, intel codex
+    store.js             player progress + save/load (useSyncExternalStore)
+    lureFight.js         boss fight state
+    useStrangerEncounter.js  when strangers appear and which trick they try
+    world.js, input.js, audio.js, fx*.js
+  components/
+    game/                2D interface: dialogue, HUD, tablet, screen transitions
+    game3d/              3D scene pieces: player, NPCs, strangers, city, boss arena
+  pages/                 one file per screen: Title, CharacterSelect, Hub, MissionBait, Credits
 ```
 
-Open the frontend URL that `base44 dev` prints (typically `http://localhost:5173`).
+Design choice: **content is separate from the engine.** Adding a new phishing email or a new stranger trick means adding an entry to `src/game/content.js`, not writing new game code.
 
-Notes:
+## Run it locally
 
-- **Every fresh clone needs `base44 link`.** It writes `base44/.app.jsonc` (the app-id pointer), which is deliberately gitignored. Your app id is in the Builder URL (`app.base44.com/apps/<id>/...`); `base44 link --help` shows the non-interactive flags.
-- **`base44 dev` runs the frontend for you** (via `site.serveCommand` in this repo's `base44/config.jsonc`) — never run `npm run dev` yourself: alone it serves a UI with no backend behind it (`[base44] Proxy not enabled`, every `/api` call fails), and alongside `base44 dev` the second Vite silently takes the next port and you end up looking at the wrong one.
-- **The app must be published at least once for the UI to load under `base44 dev`.** The frontend boots by fetching app settings from the hosted app; before the first publish that fails and every page redirects to login. The local API works regardless.
-- Entities, functions, and auth run locally — entity data is **in-memory only**, wiped when `base44 dev` restarts. Everything else (Core integrations, OAuth login) is forwarded to your deployed app. Full breakdown: [Local development overview](https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview).
-
-## Frontend Only, Hosted Backend
-
-To work on just the frontend against your app's live hosted backend:
+Requires Node.js 18 or newer.
 
 ```bash
-base44 dev --remote
+npm install
+npm run dev       # opens on http://localhost:5173
+npm run build     # production build in dist/
+npm run preview   # serve the production build
+npm run lint      # code checks
 ```
 
-⚠️ In this mode writes go to your app's **production data** — plain `base44 dev` keeps everything local.
+## What I learned
 
-## Publish Your Changes
+- How to structure a game so data and logic stay separate
+- Easing and damping (camera follow, screen transitions) so motion feels smooth
+- How to review, test and debug AI-assisted code instead of trusting it
+- How to scope a project: one polished mission beats five unfinished ones
 
-After pushing your changes to git, open the Base44 dashboard and publish the app:
+## Security practices for this repo
 
-```bash
-base44 dashboard open
-```
+Because CYBER//BREACH teaches security, the repo follows it too:
 
-This repo syncs to Base44 through git, so publish from the dashboard rather than `base44 deploy` — a CLI deploy ships your local tree directly, bypassing the sync, and the deployed state silently diverges from the repo.
+- Never commit API keys, passwords, access tokens or other secrets. `.env*` files are git-ignored.
+- Keep dependencies updated (`npm outdated`, `npm audit`).
+- Review AI-generated code before committing it, and test new features in the browser.
+- The game stores progress only in the player's own browser; it collects no personal data.
 
-## Docs & Support
+## License
 
-GitHub integration: [https://docs.base44.com/developers/app-code/local-development/github](https://docs.base44.com/developers/app-code/local-development/github)
+A license has not been chosen yet.
 
-Local development: [https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview](https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview)
+## Credits
 
-Support: [https://app.base44.com/support](https://app.base44.com/support)
+Design, security content and development: Andrew Thomas. Built with AI-assisted development tools.

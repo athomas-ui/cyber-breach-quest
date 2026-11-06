@@ -1,9 +1,9 @@
 import { useSyncExternalStore } from 'react';
-import { base44 } from '@/api/base44Client';
 import { rankFor } from '@/game/constants';
 
+// Progress is local-first: it lives in this browser's localStorage only.
 const KEY = 'cyberbreach.progress.v1';
-const FIELDS = ['hero', 'xp', 'rank', 'completed_missions', 'badges', 'quest_log', 'shards', 'intel', 'met_npcs'];
+const FIELDS = ['hero', 'xp', 'rank', 'completed_missions', 'badges', 'quest_log', 'shards', 'intel', 'met_npcs', 'strangers_beaten'];
 const DEFAULT_SETTINGS = { volume: 0.6, muted: false, quality: 'high' };
 
 export const DEFAULT_PROGRESS = {
@@ -16,13 +16,11 @@ export const DEFAULT_PROGRESS = {
   shards: [],
   intel: [],
   met_npcs: [],
+  strangers_beaten: [],
   settings: { ...DEFAULT_SETTINGS }
 };
 
 let state = { ...DEFAULT_PROGRESS, settings: { ...DEFAULT_SETTINGS } };
-let recordId = null;
-let signedIn = false;
-let saveTimer = null;
 const listeners = new Set();
 
 function normalize(raw) {
@@ -60,11 +58,6 @@ function persist() {
   } catch (e) {
     /* storage may be blocked */
   }
-  if (!signedIn || !recordId) return;
-  window.clearTimeout(saveTimer);
-  saveTimer = window.setTimeout(() => {
-    base44.entities.PlayerProgress.update(recordId, state).catch(() => {});
-  }, 700);
 }
 
 export function patch(next) {
@@ -98,6 +91,9 @@ export const actions = {
   collectShard(id) {
     if (!state.shards.includes(id)) patch({ shards: [...state.shards, id] });
   },
+  beatStranger(id) {
+    if (!state.strangers_beaten.includes(id)) patch({ strangers_beaten: [...state.strangers_beaten, id] });
+  },
   metNpc(id) {
     if (!state.met_npcs.includes(id)) patch({ met_npcs: [...state.met_npcs, id] });
   },
@@ -116,7 +112,7 @@ export const actions = {
   }
 };
 
-export async function loadProgress() {
+export function loadProgress() {
   try {
     const raw = window.localStorage.getItem(KEY);
     if (raw) {
@@ -125,27 +121,5 @@ export async function loadProgress() {
     }
   } catch (e) {
     /* ignore corrupt local save */
-  }
-
-  try {
-    const me = await base44.auth.me();
-    if (!me || !me.id) return;
-    const page = await base44.entities.PlayerProgress.filter(
-      { created_by_id: me.id },
-      { limit: 1, sort: '-updated_date' }
-    );
-    const rows = (page && page.items) || [];
-    if (rows.length) {
-      recordId = rows[0].id;
-      state = normalize(rows[0]);
-      emit();
-    } else {
-      const created = await base44.entities.PlayerProgress.create(state);
-      recordId = created && created.id ? created.id : null;
-    }
-    signedIn = true;
-    persist();
-  } catch (e) {
-    signedIn = false;
   }
 }

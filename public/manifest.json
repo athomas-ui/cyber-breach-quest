@@ -1,0 +1,11 @@
+{
+  "name": "CYBER//BREACH",
+  "short_name": "CYBER//BREACH",
+  "description": "A 3D browser game that trains players to spot phishing and social engineering.",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#04060b",
+  "theme_color": "#04060b",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

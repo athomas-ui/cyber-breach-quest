@@ -1,34 +1,24 @@
 # AGENTS.md
 
-## Project Context
+Instructions for AI coding assistants working in this repository.
 
-This is a Base44 app repository. Treat it as user-owned application code, keep changes focused on the user's request, and preserve existing project conventions.
+## Project
 
-Start with `README.md` for local setup, environment variables, and publish workflow.
+CYBER//BREACH is Andrew Thomas's 3D cybersecurity training game (React 18, Vite, three.js via React Three Fiber, Tailwind). It is a standalone, local-first web app: no backend, no accounts. Progress saves to `localStorage` in `src/game/store.js`.
 
-## Base44 References
+## Working rules
 
-- CLI overview: https://docs.base44.com/developers/references/cli/get-started/overview.md
-- Agent skills: https://docs.base44.com/developers/backend/overview/skills.md
+- Treat this as Andrew's code. Keep changes focused on what he asked for and explain them so he can defend every line in an interview.
+- Content (emails, NPC dialogue, stranger scenarios) lives in `src/game/content.js`. Add scenarios as data there before writing new engine code.
+- 3D movement and animation run inside `useFrame` with refs, not React state, so scenes don't re-render every frame.
+- Use `useScreenNav()` from `src/components/game/ScreenTransition.jsx` for page changes so transitions stay smooth.
+- Never commit secrets. `.env*` files are ignored.
 
-If your agent supports Agent Skills, install or update Base44 skills before Base44-specific work:
+## Checks before finishing
 
 ```bash
-npx skills add base44/skills
+npm run lint
+npm run build
 ```
 
-## Key Files
-
-- `src/`: frontend application source.
-- `src/api/base44Client.js`: frontend Base44 SDK client.
-- `vite.config.js`: Vite config and Base44 Vite plugin setup.
-- `.env.local`: local-only environment values; never commit secrets.
-
-## Working Notes
-
-- Use `base44 dev` as the default local development command when you need the local Base44 backend. It can run the backend and frontend together.
-- When docs or code mention the frontend being started automatically, that usually means the Base44 project config includes `site.serveCommand`, for example `"serveCommand": "npm run dev"` in `base44/config.jsonc`.
-- Use `npm run dev` only for frontend-only work against the hosted Base44 backend.
-- Prefer the existing Base44 CLI workflow over adding new npm scripts for Base44-specific tasks.
-- Reuse the existing SDK client and Vite plugin patterns before adding new Base44 integration paths.
-- Run the relevant checks from `package.json` before finishing code changes.
+Then play the hub and THE BAIT once in a browser to confirm nothing broke.

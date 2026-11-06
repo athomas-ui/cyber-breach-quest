@@ -63,10 +63,10 @@ export default function HubHud({ game, hero, onTablet, prompt }) {
           Moves
         </p>
         {[
-          ['J', 'Punch combo'],
-          ['K', 'Spin kick'],
+          ['J', 'Scan'],
+          ['K', 'Firewall'],
           ['L', 'Dash'],
-          ['F', 'Cyber blast'],
+          ['F', 'Uplink'],
           ['SPACE ×2', 'Flip jump']
         ].map(([key, label]) => (
           <p key={key} className="mt-1 font-display text-[9px] tracking-[0.15em] text-white/55">
