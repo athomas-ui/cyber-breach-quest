@@ -1,0 +1,57 @@
+# Builds CYBER//BREACH and publishes it to GitHub Pages every time main is pushed.
+# Live URL: https://athomas-ui.github.io/cyber-breach-quest/
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # adds a "Run workflow" button on the Actions tab
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies (exact versions from package-lock.json)
+        run: npm ci
+
+      - name: Build the game for the /cyber-breach-quest/ path
+        run: npm run build
+        env:
+          BASE_PATH: /cyber-breach-quest/
+
+      - name: Let deep links like /hub load the game instead of a 404 page
+        run: cp dist/index.html dist/404.html
+
+      - name: Package the build for Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

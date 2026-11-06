@@ -14,7 +14,7 @@ import Credits from '@/pages/Credits';
 // saves progress in the browser (see src/game/store.js).
 function App() {
   return (
-    <Router>
+    <Router basename={import.meta.env.BASE_URL}>
       <ScrollToTop />
       <GameProvider>
         <ScreenTransition>

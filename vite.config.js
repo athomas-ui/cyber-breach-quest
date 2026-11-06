@@ -3,7 +3,11 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
 // CYBER//BREACH build config. "@" points at src/ so imports read "@/game/store".
+// BASE_PATH is set by the GitHub Pages workflow, because the game is served from
+// https://athomas-ui.github.io/cyber-breach-quest/ instead of the site root.
+// Locally (npm run dev / build / preview) it stays "/".
 export default defineConfig({
+  base: process.env.BASE_PATH || '/',
   plugins: [react()],
   resolve: {
     alias: {
