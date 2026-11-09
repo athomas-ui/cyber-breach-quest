@@ -76,53 +76,69 @@ export default function Title() {
 
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,transparent_10%,rgba(4,6,11,0.85)_70%)]" />
 
-      <div className="relative flex h-full flex-col items-center justify-between px-6 py-10 sm:py-14">
-        <div className="text-center">
-          <p className="font-display text-[10px] uppercase tracking-[0.55em] text-emerald-400/70">
-            Neon Chicago · Security District
+      <div className="relative flex h-full flex-col px-5 py-5 sm:px-8 sm:py-7">
+        <header className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4">
+          <p className="font-display text-[10px] uppercase tracking-[0.22em] text-white/75 sm:text-xs sm:tracking-[0.3em]">
+            Neon Chicago <span className="text-emerald-300">/</span> Security District
           </p>
-        </div>
-
-        <div className="text-center">
-          <h1 className="cb-glitch font-display text-[13vw] leading-none tracking-tighter text-white sm:text-7xl md:text-8xl">
-            CYBER<span className="text-emerald-400">//</span>BREACH
-          </h1>
-          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/45">
-            A cybersecurity action adventure. Sort the flood, spot the fake, and break the breach one
-            decision at a time.
+          <p className="flex shrink-0 items-center gap-2 font-mono text-[9px] uppercase tracking-[0.16em] text-emerald-200 sm:text-[10px]">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_10px_rgba(110,231,183,0.9)]" />
+            System online
           </p>
-        </div>
+        </header>
 
-        <div className="w-full max-w-xs space-y-2.5">
-          <button
-            onClick={() => go('/select')}
-            className="group flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-400/50 bg-emerald-400/10 py-3.5 font-display text-xs uppercase tracking-[0.3em] text-emerald-200 transition hover:bg-emerald-400/20"
-          >
-            <Play className="h-4 w-4" />
-            {hasProgress ? 'New operative' : 'Start'}
-          </button>
+        <main className="flex flex-1 items-center justify-center py-5">
+          <section className="w-full max-w-3xl rounded-2xl border border-emerald-300/20 bg-[#050b10]/85 px-5 py-7 text-center shadow-[0_0_70px_rgba(0,255,157,0.08)] backdrop-blur-md sm:px-10 sm:py-10">
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-200 sm:text-xs sm:tracking-[0.3em]">
+              Cybersecurity training simulation <span className="text-white/40">// 01</span>
+            </p>
+            <h1 className="cb-glitch mt-4 whitespace-nowrap font-display text-[clamp(2rem,8vw,5.25rem)] leading-none tracking-[-0.08em] text-white">
+              CYBER<span className="text-emerald-300">//</span>BREACH
+            </h1>
+            <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
+              Train your threat-detection instincts. Triage suspicious messages, verify identities, and
+              stop social engineering before it becomes a breach.
+            </p>
 
-          {hasProgress && (
-            <button
-              onClick={() => go('/hub')}
-              className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 py-3 font-display text-xs uppercase tracking-[0.3em] text-white/70 transition hover:border-white/40 hover:text-white"
-            >
-              <RotateCcw className="h-3.5 w-3.5" />
-              Continue · {game.rank}
-            </button>
-          )}
+            <div className="mt-6 flex flex-wrap justify-center gap-2 font-mono text-[9px] uppercase tracking-[0.12em] text-white/75 sm:gap-3 sm:text-[10px]">
+              <span className="rounded border border-white/15 bg-white/[0.04] px-2.5 py-1.5">Threat triage</span>
+              <span className="rounded border border-white/15 bg-white/[0.04] px-2.5 py-1.5">Identity checks</span>
+              <span className="rounded border border-white/15 bg-white/[0.04] px-2.5 py-1.5">Breach response</span>
+            </div>
 
-          <button
-            onClick={() => go('/credits')}
-            className="flex w-full items-center justify-center gap-1 rounded-lg py-2 font-display text-[10px] uppercase tracking-[0.35em] text-white/30 transition hover:text-white/70"
-          >
-            Credits <ChevronRight className="h-3 w-3" />
-          </button>
-        </div>
-      </div>
+            <div className="mx-auto mt-7 w-full max-w-xs space-y-2.5">
+              <button
+                onClick={() => go('/select')}
+                className="group flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-200 bg-emerald-300 py-3.5 font-display text-xs font-bold uppercase tracking-[0.2em] text-[#04100b] shadow-[0_0_24px_rgba(52,211,153,0.2)] transition hover:bg-emerald-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-200"
+              >
+                <Play className="h-4 w-4" />
+                {hasProgress ? 'New operative' : 'Begin training'}
+              </button>
 
-      <div className="pointer-events-none absolute bottom-4 left-0 right-0 text-center font-display text-[9px] uppercase tracking-[0.4em] text-white/15">
-        {MISSIONS.length} mission gates · 1 showcase level live · created by Andrew Thomas, i.c.stars Cycle 60
+              {hasProgress && (
+                <button
+                  onClick={() => go('/hub')}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/25 bg-white/[0.04] py-3 font-display text-xs uppercase tracking-[0.2em] text-white/90 transition hover:border-white/50 hover:bg-white/[0.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  Continue · {game.rank}
+                </button>
+              )}
+
+              <button
+                onClick={() => go('/credits')}
+                className="mx-auto flex items-center justify-center gap-1 rounded-lg px-4 py-2 font-display text-[10px] uppercase tracking-[0.25em] text-white/65 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                Credits <ChevronRight className="h-3 w-3" />
+              </button>
+            </div>
+          </section>
+        </main>
+
+        <footer className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-center gap-x-3 gap-y-1 border-t border-white/10 pt-3 text-center font-mono text-[9px] uppercase tracking-[0.12em] text-white/60 sm:justify-between sm:text-[10px]">
+          <span>{MISSIONS.length} mission gates · 1 showcase level live</span>
+          <span>Created by Andrew Thomas · i.c.stars Cycle 60</span>
+        </footer>
       </div>
     </div>
   );
