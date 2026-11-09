@@ -7,11 +7,13 @@ import { playerPos, groundHeightAt, world, gameClock } from '@/game/world';
 import { shakeState, burst, addShake } from '@/game/fx3d';
 import { sfx } from '@/game/audio';
 import { HEROES } from '@/game/constants';
+import { emitAbility, SCAN_RANGE } from '@/game/abilities';
 
 // Cyber-defender abilities (no fighting): scan the area, raise a firewall,
 // dash, and send an uplink beam. Durations are in seconds.
+// What each tool DOES in the world lives in the screen that listens to
+// emitAbility() (see src/game/abilities.js). This file only animates it.
 const MOVE_TIME = { scan: 0.6, firewall: 0.7, dash: 0.26, uplink: 0.9 };
-const SCAN_RANGE = 7; // radius the scan ring grows to
 const FX_LIFE = { scan: 1.1, firewall: 1.4, uplink: 1.2 };
 
 export default function Player({
@@ -123,12 +125,14 @@ export default function Player({
           f.scan = FX_LIFE.scan;
           f.scanPos.set(playerPos.x, playerPos.y + 0.06, playerPos.z);
           sfx('scan');
+          emitAbility('scan');
         } else if (act.name === 'firewall' && act.t >= 0.2) {
           // a protective hex dome pops up around the player
           act.fired = true;
           f.firewall = FX_LIFE.firewall;
           sfx('firewall');
           burst(fxAt(0, 1), hero.glow, 12, 3);
+          emitAbility('firewall');
         } else if (act.name === 'uplink' && act.t >= 0.4) {
           // a signal beam shoots from the raised hand up into the sky
           act.fired = true;
@@ -136,6 +140,7 @@ export default function Player({
           f.uplinkPos.set(playerPos.x, playerPos.y, playerPos.z);
           sfx('uplink');
           addShake(0.08);
+          emitAbility('uplink');
           burst(fxAt(0.2, 2.2), hero.glow, 16, 5);
         }
       }

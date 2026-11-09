@@ -1,6 +1,7 @@
 import React from 'react';
 import { Shield, Layers, Tablet as TabletIcon, Radio } from 'lucide-react';
 import { rankFor, rankProgress, nextRank, MISSIONS, gateState } from '@/game/constants';
+import ControlsLegend from '@/components/game/ControlsLegend';
 
 export default function HubHud({ game, hero, onTablet, prompt }) {
   const rank = rankFor(game.xp);
@@ -58,22 +59,7 @@ export default function HubHud({ game, hero, onTablet, prompt }) {
         </span>
       </div>
 
-      <div className="pointer-events-none fixed bottom-5 left-5 z-20 hidden rounded-lg border border-white/10 bg-black/45 px-3 py-2 backdrop-blur-md sm:block">
-        <p className="font-display text-[9px] uppercase tracking-[0.25em]" style={{ color: hero.color }}>
-          Moves
-        </p>
-        {[
-          ['J', 'Scan'],
-          ['K', 'Firewall'],
-          ['L', 'Dash'],
-          ['F', 'Uplink'],
-          ['SPACE ×2', 'Flip jump']
-        ].map(([key, label]) => (
-          <p key={key} className="mt-1 font-display text-[9px] tracking-[0.15em] text-white/55">
-            <span className="text-white/85">{key}</span> · {label}
-          </p>
-        ))}
-      </div>
+      <ControlsLegend color={hero.color} />
 
       {prompt && (
         <div className="pointer-events-none fixed inset-x-0 bottom-28 z-20 flex justify-center px-4 sm:bottom-8">

@@ -1,6 +1,7 @@
 import React from 'react';
 import { actions } from '@/game/store';
 import { setVolume, sfx } from '@/game/audio';
+import { CONTROL_GROUPS, LEGEND_TOGGLE_KEY } from '@/game/controls';
 
 export default function SettingsPanel({ game, hero }) {
   const { settings } = game;
@@ -70,12 +71,8 @@ export default function SettingsPanel({ game, hero }) {
       <div className="space-y-1.5">
         <span className="text-sm text-white/70">Controls</span>
         {[
-          ['WASD / Arrows', 'Move'],
-          ['Shift', 'Sprint'],
-          ['Space', 'Jump'],
-          ['E', 'Interact / report'],
-          ['Tab', 'Open tablet'],
-          ['Drag', 'Orbit camera']
+          ...CONTROL_GROUPS.flatMap((g) => g.items.map((item) => [item.keys, item.label])),
+          [LEGEND_TOGGLE_KEY, 'Hide / show legend']
         ].map(([key, label]) => (
           <div key={key} className="flex items-center justify-between rounded-md bg-white/[0.03] px-3 py-1.5">
             <span className="font-display text-[10px] uppercase tracking-[0.2em] text-white/55">{key}</span>

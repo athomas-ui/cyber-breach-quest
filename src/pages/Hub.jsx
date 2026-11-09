@@ -16,11 +16,14 @@ import FxLayer from '@/components/game/FxLayer';
 import TouchControls from '@/components/game/TouchControls';
 import MissionGuide from '@/components/game3d/MissionGuide';
 import StrangerActor from '@/components/game3d/StrangerActor';
+import AbilityMarkers from '@/components/game3d/AbilityMarkers';
+import ControlsIntro, { controlsIntroSeen, INTRO_SEEN_KEY } from '@/components/game/ControlsIntro';
 import { useGame, actions } from '@/game/store';
-import { HEROES, MISSIONS, GATE_SLOTS, gateState, gateRequirement } from '@/game/constants';
+import { HEROES, MISSIONS, GATE_SLOTS, SHARD_SPOTS, gateState, gateRequirement } from '@/game/constants';
 import { NPCS, STRANGERS } from '@/game/content';
 import useStrangerEncounter from '@/game/useStrangerEncounter';
-import { clearWorld } from '@/game/world';
+import { clearWorld, playerPos } from '@/game/world';
+import { onAbility, addMarker, clearMarkers, SCAN_RANGE } from '@/game/abilities';
 import { useOrbitDrag, takeTablet } from '@/game/input';
 import { burst, addShake } from '@/game/fx3d';
 import { fx } from '@/game/fx';
@@ -28,6 +31,29 @@ import { startMusic, sfx, ensureAudio } from '@/game/audio';
 import useIsTouch from '@/game/useIsTouch';
 
 const HUB_SPAWN = [0, 13];
+
+const distTo = (x, z) => Math.hypot(x - playerPos.x, z - playerPos.z);
+
+// Uplink: where should the SOC send the player next?
+// 1) THE BAIT if its gate is open, 2) the nearest shard still out there, 3) any other open gate.
+function nextObjective(game) {
+  const baitIdx = MISSIONS.findIndex((m) => m.id === 'bait');
+  if (baitIdx >= 0 && gateState(MISSIONS[baitIdx], game) === 'unlocked') {
+    const slot = GATE_SLOTS[baitIdx];
+    return { x: slot.x, y: 0, z: slot.z, label: MISSIONS[baitIdx].name };
+  }
+  const collected = game.shards || [];
+  let best = null;
+  SHARD_SPOTS.forEach((s) => {
+    if (collected.includes(s.id)) return;
+    const d = distTo(s.position[0], s.position[2]);
+    if (!best || d < best.d) best = { x: s.position[0], y: s.position[1], z: s.position[2], d, label: 'DATA SHARD' };
+  });
+  if (best) return best;
+  const open = MISSIONS.findIndex((m) => gateState(m, game) === 'unlocked');
+  if (open >= 0) return { x: GATE_SLOTS[open].x, y: 0, z: GATE_SLOTS[open].z, label: MISSIONS[open].name };
+  return null;
+}
 
 function GateCinematic({ slot, onDone }) {
   const { camera } = useThree();
@@ -71,10 +97,67 @@ export default function Hub() {
   const [banner, setBanner] = useState(null);
   const [guideStyle, setGuideStyle] = useState(() => window.sessionStorage.getItem('cb_guide_style'));
   const [pendingNotice, setPendingNotice] = useState(null);
+  const [showIntro, setShowIntro] = useState(() => !controlsIntroSeen());
+  const [scannedKey, setScannedKey] = useState(null);
+  const introOpen = !!guideStyle && showIntro && !isTouch;
 
   // Social engineering ambush: strangers only show up while the player is free-roaming.
   const { encounter, setPhase: setStrangerPhase, finish: finishStranger } = useStrangerEncounter(
-    !!guideStyle && !dialogue && !tablet && !notice && !cinematicGate
+    !!guideStyle && !introOpen && !dialogue && !tablet && !notice && !cinematicGate
+  );
+
+  const closeIntro = useCallback(() => {
+    try {
+      window.localStorage.setItem(INTRO_SEEN_KEY, '1');
+    } catch {
+      /* storage blocked: the card simply shows again next visit */
+    }
+    setShowIntro(false);
+  }, []);
+
+  // Analyst tools. Player.jsx fires these when the move lands; here we decide what they do.
+  const live = useRef(null);
+  live.current = { game, encounter, setStrangerPhase };
+  useEffect(
+    () =>
+      onAbility((name) => {
+        const { game: g, encounter: enc, setStrangerPhase: setPhase } = live.current;
+        const incoming = enc && enc.phase === 'approach';
+
+        if (name === 'scan') {
+          // Scan: reveal every uncollected shard inside the scan ring, and flag an incoming stranger.
+          const collected = g.shards || [];
+          const found = SHARD_SPOTS.filter(
+            (s) => !collected.includes(s.id) && distTo(s.position[0], s.position[2]) <= SCAN_RANGE
+          );
+          found.forEach((s) =>
+            addMarker({ x: s.position[0], y: s.position[1], z: s.position[2], color: '#7ffff0', height: 6, life: 6 })
+          );
+          fx(found.length ? `${found.length} SHARD${found.length > 1 ? 'S' : ''} IN RANGE` : 'SCAN · AREA CLEAR');
+          if (incoming) {
+            setScannedKey(enc.key);
+            fx('UNVERIFIED CONTACT', 'bad');
+          }
+        } else if (name === 'firewall') {
+          // Firewall: block the stranger before they reach you. Safe, but you learn nothing.
+          if (incoming) {
+            setPhase('leave');
+            fx('CONNECTION BLOCKED');
+          } else {
+            fx('FIREWALL UP · NO THREATS');
+          }
+        } else if (name === 'uplink') {
+          // Uplink: the SOC drops a beacon on your next objective.
+          const target = nextObjective(g);
+          if (!target) {
+            fx('SOC · ALL CLEAR');
+            return;
+          }
+          addMarker({ x: target.x, y: target.y, z: target.z, color: '#fbbf24', height: 22, life: 8 });
+          fx(`SOC · ${target.label} · ${Math.round(distTo(target.x, target.z))}M`);
+        }
+      }),
+    []
   );
 
   useEffect(() => {
@@ -93,6 +176,7 @@ export default function Hub() {
     }
     return () => {
       clearWorld();
+      clearMarkers();
     };
   }, []);
 
@@ -260,7 +344,7 @@ export default function Hub() {
     setGuideStyle(style);
   }
 
-  const frozen = !!dialogue || tablet || !!notice || !guideStyle;
+  const frozen = !!dialogue || tablet || !!notice || !guideStyle || introOpen;
 
   return (
     <div ref={canvasRef} className="fixed inset-0 touch-none overflow-hidden bg-[#1e3354]">
@@ -298,6 +382,7 @@ export default function Hub() {
             onGone={finishStranger}
           />
         )}
+        <AbilityMarkers />
         <Sparks />
         <Interactor onNear={setNear} onInteract={handleInteract} enabled={!frozen && !cinematicGate} />
         {cinematicGate && (
@@ -315,6 +400,8 @@ export default function Hub() {
 
       {!guideStyle && <GuideChoice onChoose={chooseGuide} />}
 
+      {introOpen && <ControlsIntro color={hero.color} onClose={closeIntro} />}
+
       {banner && (
         <div className="pointer-events-none fixed inset-x-0 top-24 z-30 flex justify-center px-4">
           <div className="cb-rise rounded-lg border border-emerald-400/40 bg-black/70 px-5 py-2.5 text-center backdrop-blur">
@@ -331,9 +418,14 @@ export default function Hub() {
             style={{ borderColor: `${encounter.scenario.color}88` }}
           >
             <p className="font-display text-[9px] uppercase tracking-[0.4em]" style={{ color: encounter.scenario.color }}>
-              Incoming contact
+              {scannedKey === encounter.key ? 'Unverified contact' : 'Incoming contact'}
             </p>
-            <p className="mt-0.5 text-sm text-white/85">Someone is walking straight toward you. Stay sharp.</p>
+            <p className="mt-0.5 text-sm text-white/85">
+              {scannedKey === encounter.key
+                ? 'Scan found no badge on record. Verify before you trust.'
+                : 'Someone is walking straight toward you. Stay sharp.'}
+            </p>
+            <p className="mt-1 font-display text-[9px] tracking-[0.2em] text-white/45">J SCAN · K BLOCK · OR LET THEM TALK</p>
           </div>
         </div>
       )}
