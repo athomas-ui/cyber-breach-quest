@@ -74,12 +74,12 @@ export default function Player({
 
     const mv = frozen ? { x: 0, y: 0 } : getMove();
     const cy = controls.orbitYaw;
-    const fx = -Math.sin(cy);
-    const fz = -Math.cos(cy);
+    const camFwdX = -Math.sin(cy);
+    const camFwdZ = -Math.cos(cy);
     const rx = Math.cos(cy);
     const rz = -Math.sin(cy);
-    let dx = fx * mv.y + rx * mv.x;
-    let dz = fz * mv.y + rz * mv.x;
+    let dx = camFwdX * mv.y + rx * mv.x;
+    let dz = camFwdZ * mv.y + rz * mv.x;
     let mag = Math.hypot(dx, dz);
     if (mag > 1) {
       dx /= mag;

@@ -104,9 +104,9 @@ export default function DistrictBase({ quality }) {
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[190, 190]} />
         <meshStandardMaterial
-          color="#050810"
-          roughness={0.22}
-          metalness={0.85}
+          color="#2b4466"
+          roughness={0.55}
+          metalness={0.3}
           emissive="#0a3a33"
           emissiveMap={groundTex}
           emissiveIntensity={0.5}
@@ -116,7 +116,7 @@ export default function DistrictBase({ quality }) {
       {puddles.map(([x, z, r], i) => (
         <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.015, z]}>
           <circleGeometry args={[r, 26]} />
-          <meshStandardMaterial color="#0b1a26" roughness={0.06} metalness={1} transparent opacity={0.85} />
+          <meshStandardMaterial color="#3b6a94" roughness={0.1} metalness={0.4} transparent opacity={0.85} />
         </mesh>
       ))}
 

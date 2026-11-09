@@ -263,13 +263,14 @@ export default function Hub() {
   const frozen = !!dialogue || tablet || !!notice || !guideStyle;
 
   return (
-    <div ref={canvasRef} className="fixed inset-0 touch-none overflow-hidden bg-[#04060b]">
+    <div ref={canvasRef} className="fixed inset-0 touch-none overflow-hidden bg-[#1e3354]">
       <Canvas
         dpr={quality === 'high' ? [1, 2] : 1}
         gl={{ antialias: quality === 'high' }}
         camera={{ fov: 55, near: 0.1, far: 400, position: [0, 4, 21] }}
       >
-        <fog attach="fog" args={['#050a12', 34, 150]} />
+        <color attach="background" args={['#1e3354']} />
+        <fog attach="fog" args={['#1e3354', 34, 150]} />
         <ambientLight intensity={0.55} color="#5f7fb5" />
         <directionalLight position={[12, 24, 8]} intensity={0.35} color="#9ad6ff" />
         <CityDistrict quality={quality} progress={game} />
